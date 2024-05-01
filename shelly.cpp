@@ -78,9 +78,7 @@ int main(int argc, char* argv[]) {
         cout << processedPrompt;
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
-            // Extracting the new prompt from the input
             prompt = input.substr(11);
-            // Writing the new prompt to the config file
             if (!writeConfig(prompt)) {
                 cerr << "Error: Failed to set prompt." << endl;
             }
