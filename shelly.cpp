@@ -6,35 +6,49 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <pwd.h>
 
 using namespace std;
 
 string prompt;
 string input;
 
-int writeConfig(const string& prompt) {
-    string directoryPath = "/etc/shelly";
+string getHomeDirectory() {
+    struct passwd *pw = getpwuid(getuid());
+    return pw->pw_dir;
+}
 
-    if (access(directoryPath.c_str(), F_OK) != 0) {
-        if (mkdir(directoryPath.c_str(), 0755) != 0) {
+int writeConfig(const string& prompt) {
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "prompt";
+
+    struct stat st = {0};
+    if (stat(configDir.c_str(), &st) == -1) {
+        if (mkdir(configDir.c_str(), 0700) == -1) {
+            cerr << "Error: Unable to create directory: " << configDir << endl;
             return 0;
         }
     }
 
-    ofstream configFile("/etc/shelly/config");
-    if (configFile.is_open()) {
-        configFile << prompt;
-        configFile.close();
-        return 1;
+    ofstream ofs(configFile);
+    if (!ofs.is_open()) {
+        cerr << "Error: Unable to open config file for writing: " << configFile << endl;
+        return 0;
     }
-    return 0;
+
+    ofs << prompt;
+    ofs.close();
+    return 1;
 }
 
 int readConfig() {
-    ifstream configFile("/etc/shelly/config");
-    if (configFile.is_open()) {
-        getline(configFile, prompt);
-        configFile.close();
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "prompt";
+
+    ifstream configFileStream(configFile);
+    if (configFileStream.is_open()) {
+        getline(configFileStream, prompt);
+        configFileStream.close();
         return 1;
     }
     return 0;
@@ -64,7 +78,12 @@ int main(int argc, char* argv[]) {
         cout << processedPrompt;
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
+            // Extracting the new prompt from the input
             prompt = input.substr(11);
+            // Writing the new prompt to the config file
+            if (!writeConfig(prompt)) {
+                cerr << "Error: Failed to set prompt." << endl;
+            }
         }
         else if (!input.empty()) {
             istringstream iss(input);
