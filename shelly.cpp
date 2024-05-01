@@ -1,15 +1,14 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>
-#include <sys/wait.h>
-#include <unistd.h>
 #include <sstream>
 #include <vector>
+#include <cstring>
+#include <unistd.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 
 using namespace std;
 
-fstream configFile;
 string prompt;
 string input;
 
@@ -22,7 +21,7 @@ int writeConfig(const string& prompt) {
         }
     }
 
-    configFile.open("/etc/shelly/config", ios::out);
+    ofstream configFile("/etc/shelly/config");
     if (configFile.is_open()) {
         configFile << prompt;
         configFile.close();
@@ -32,7 +31,7 @@ int writeConfig(const string& prompt) {
 }
 
 int readConfig() {
-    configFile.open("/etc/shelly/config", ios::in);
+    ifstream configFile("/etc/shelly/config");
     if (configFile.is_open()) {
         getline(configFile, prompt);
         configFile.close();
@@ -41,22 +40,33 @@ int readConfig() {
     return 0;
 }
 
+string replaceCwd(const string& input) {
+    string result = input;
+    size_t pos = result.find("{cwd}");
+    if (pos != string::npos) {
+        char cwd[1024];
+        if (getcwd(cwd, sizeof(cwd)) != nullptr) {
+            result.replace(pos, 5, cwd);
+        }
+    }
+    return result;
+}
+
 int main(int argc, char* argv[]) {
     if (!readConfig()) {
-        // TO:DO make a setup wizard so lazy people dont have to go through the pain of running a command
         cout << "Config file not found or empty. Defaulting to \"$ \"." << endl;
         cout << "Run \"set prompt\" to set a prompt." << endl;
         prompt = "$ ";
     }
 
     while(true) {
-        cout << prompt;
+        string processedPrompt = replaceCwd(prompt);
+        cout << processedPrompt;
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
             prompt = input.substr(11);
         }
         else if (!input.empty()) {
-            // i have no idea what the fuck im doing
             istringstream iss(input);
             vector<char*> args;
             string arg;
@@ -65,7 +75,6 @@ int main(int argc, char* argv[]) {
             }
             args.push_back(nullptr); 
 
-            // had to make it more complicated cuz the easy way exited the program after running a command even in while true loop
             pid_t pid = fork();
             if (pid == 0) {
                 execvp(args[0], args.data());
