@@ -101,7 +101,6 @@ int main(int argc, char* argv[]) {
             } else {
                 cout << "Failed to fork process." << endl;
             }
-
             for (auto& arg : args) {
                 free(arg);
             }
