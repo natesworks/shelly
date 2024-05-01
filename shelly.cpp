@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
             system(input.c_str());
         #else
             if (!input.empty()) {
+                // i have no idea what the fuck im doing
                 istringstream iss(input);
                 vector<char*> args;
                 string arg;
@@ -62,6 +63,7 @@ int main(int argc, char* argv[]) {
                 }
                 args.push_back(nullptr); 
 
+                // had to make it more complicated cuz the easy way exited the program after running a command even in while true loop
                 pid_t pid = fork();
                 if (pid == 0) {
                     execvp(args[0], args.data());
