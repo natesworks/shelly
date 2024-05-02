@@ -54,13 +54,14 @@ int readConfig() {
     return 0;
 }
 
-void getPrompt()
+string getPrompt()
 {
+    string refactoredPrompt = prompt;
     size_t pos = prompt.find("{cwd}");
     if (pos != string::npos) {
         char cwd[1024];
         if (getcwd(cwd, sizeof(cwd)) != nullptr) {
-            prompt.replace(pos, 5, cwd);
+            refactoredPrompt.replace(pos, 5, cwd);
         }
     }
 
@@ -68,7 +69,7 @@ void getPrompt()
     if (pos != string::npos) {
         char hostname[1024];
         if (gethostname(hostname, sizeof(hostname)) != -1) {
-            prompt.replace(pos, 10, hostname);
+            refactoredPrompt.replace(pos, 10, hostname);
         }
     }
 
@@ -76,20 +77,22 @@ void getPrompt()
     if (pos != string::npos) {
         char username[1024];
         if (getlogin_r(username, sizeof(username)) == 0) {
-            prompt.replace(pos, 10, username);
+            refactoredPrompt.replace(pos, 10, username);
         }
     }
+    return refactoredPrompt;
 }
 
 int main(int argc, char* argv[]) {
     if (!readConfig()) {
         cout << "Run \"set prompt\" to set a prompt." << endl;
         prompt = "[{username}@{hostname}]{cwd}% ";
+        writeConfig(prompt);
     }
 
     while(true) {
-        getPrompt();
-        cout << prompt;
+        string refactoredPrompt = getPrompt();
+        cout << refactoredPrompt;
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
             prompt = input.substr(11);
