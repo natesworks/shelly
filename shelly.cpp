@@ -54,35 +54,31 @@ int readConfig() {
     return 0;
 }
 
-string getPrompt()
+void getPrompt()
 {
-    string result = prompt;
-
-    size_t pos = result.find("{cwd}");
+    size_t pos = prompt.find("{cwd}");
     if (pos != string::npos) {
         char cwd[1024];
         if (getcwd(cwd, sizeof(cwd)) != nullptr) {
-            result.replace(pos, 5, cwd);
+            prompt.replace(pos, 5, cwd);
         }
     }
 
-    pos = result.find("{hostname}");
+    pos = prompt.find("{hostname}");
     if (pos != string::npos) {
         char hostname[1024];
         if (gethostname(hostname, sizeof(hostname)) != -1) {
-            result.replace(pos, 10, hostname);
+            prompt.replace(pos, 10, hostname);
         }
     }
 
-    pos = result.find("{username}");
+    pos = prompt.find("{username}");
     if (pos != string::npos) {
         char username[1024];
         if (getlogin_r(username, sizeof(username)) == 0) {
-            result.replace(pos, 10, username);
+            prompt.replace(pos, 10, username);
         }
     }
-
-    return result;
 }
 
 int main(int argc, char* argv[]) {
@@ -92,7 +88,7 @@ int main(int argc, char* argv[]) {
     }
 
     while(true) {
-        prompt = getPrompt();
+        getPrompt();
         cout << prompt;
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
