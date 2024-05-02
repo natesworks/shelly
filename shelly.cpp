@@ -83,6 +83,9 @@ int main(int argc, char* argv[]) {
                 cerr << "Error: Failed to set prompt." << endl;
             }
         }
+        else if (input == "exit") {
+            exit(1);
+        }
         else if (!input.empty()) {
             istringstream iss(input);
             vector<char*> args;
