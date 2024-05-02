@@ -87,8 +87,10 @@ int main(int argc, char* argv[]) {
             exit(1);
         }
         else if (input.find("cd ") == 0) {
-            prompt = input.substr(3);
-            chdir(prompt.data());
+            chdir(input.substr(3).data());
+        }
+        else if (input.find("echo ") == 0) {
+            cout << input.substr(4) << endl;
         }
         else if (!input.empty()) {
             istringstream iss(input);
