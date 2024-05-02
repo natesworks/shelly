@@ -86,6 +86,10 @@ int main(int argc, char* argv[]) {
         else if (input == "exit") {
             exit(1);
         }
+        else if (input.find("cd ") == 0) {
+            prompt = input.substr(3);
+            chdir(prompt.data());
+        }
         else if (!input.empty()) {
             istringstream iss(input);
             vector<char*> args;
