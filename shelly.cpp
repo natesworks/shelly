@@ -54,8 +54,10 @@ int readConfig() {
     return 0;
 }
 
-string replaceCwd(const string& input) {
-    string result = input;
+string getPrompt()
+{
+    string result = prompt;
+
     size_t pos = result.find("{cwd}");
     if (pos != string::npos) {
         char cwd[1024];
@@ -63,19 +65,35 @@ string replaceCwd(const string& input) {
             result.replace(pos, 5, cwd);
         }
     }
+
+    pos = result.find("{hostname}");
+    if (pos != string::npos) {
+        char hostname[1024];
+        if (gethostname(hostname, sizeof(hostname)) != -1) {
+            result.replace(pos, 10, hostname);
+        }
+    }
+
+    pos = result.find("{username}");
+    if (pos != string::npos) {
+        char username[1024];
+        if (getlogin_r(username, sizeof(username)) == 0) {
+            result.replace(pos, 10, username);
+        }
+    }
+
     return result;
 }
 
 int main(int argc, char* argv[]) {
     if (!readConfig()) {
-        cout << "Config file not found or empty. Defaulting to \"$ \"." << endl;
         cout << "Run \"set prompt\" to set a prompt." << endl;
-        prompt = "$ ";
+        prompt = "[{username}@{hostname}]{cwd}% ";
     }
 
     while(true) {
-        string processedPrompt = replaceCwd(prompt);
-        cout << processedPrompt;
+        prompt = getPrompt();
+        cout << prompt;
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
             prompt = input.substr(11);
@@ -88,6 +106,9 @@ int main(int argc, char* argv[]) {
         }
         else if (input.find("cd ") == 0) {
             chdir(input.substr(3).data());
+        }
+        else if (input == "get prompt") {
+            cout << prompt << endl;
         }
         else if (input.find("echo ") == 0) {
             cout << input.substr(4) << endl;
