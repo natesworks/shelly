@@ -15,7 +15,9 @@ Shelly is a simple shell implemented in C++. It provides basic functionality for
 ## Colors
 
 To change the texts foreground or background colors you can use ansi escape codes
+
 ``\033[0m``
+
 replace 0 with a color code.
 
 ## Built-in Commands
