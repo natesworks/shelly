@@ -87,12 +87,11 @@ int main(int argc, char* argv[]) {
     if (!readConfig()) {
         cout << "Run \"set prompt\" to set a prompt." << endl;
         prompt = "[{username}@{hostname}]{cwd}% ";
-        writeConfig(prompt);
     }
 
     while(true) {
         string refactoredPrompt = getPrompt();
-        cout << refactoredPrompt;
+        cout << '\033' << refactoredPrompt.substr(4) + "\033[0m";
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
             prompt = input.substr(11);
