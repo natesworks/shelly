@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <pwd.h>
+#include <filesystem>
 
 using namespace std;
 
@@ -57,32 +58,29 @@ int readConfig() {
 string getPrompt()
 {
     string refactoredPrompt = prompt;
-    size_t pos = prompt.find("{cwd}");
-    if (pos != string::npos) {
-        char cwd[1024];
-        if (getcwd(cwd, sizeof(cwd)) != nullptr) {
-            refactoredPrompt.replace(pos, 5, cwd);
+    std::size_t pos = 0;
+
+    string username = getlogin();
+
+    char hostname_buffer[1024];
+    gethostname(hostname_buffer, sizeof(hostname_buffer) - 1);
+    hostname_buffer[sizeof(hostname_buffer) - 1] = '\0';
+    std::string hostname(hostname_buffer);
+
+    while ((pos = refactoredPrompt.find("{", pos)) != string::npos) {
+        string placeholder = refactoredPrompt.substr(pos, refactoredPrompt.find('}', pos + 1) - pos + 1);
+        if (placeholder == "{cwd}") {
+        refactoredPrompt.replace(pos, placeholder.length(), filesystem::current_path().string());
+        } else if (placeholder == "{username}") {
+        refactoredPrompt.replace(pos, placeholder.length(), username);
+        } else if (placeholder == "{hostname}") {
+        refactoredPrompt.replace(pos, placeholder.length(), hostname);
         }
+        pos += placeholder.length();
     }
 
-    pos = prompt.find("{hostname}");
-    if (pos != string::npos) {
-        char hostname[1024];
-        if (gethostname(hostname, sizeof(hostname)) != -1) {
-            refactoredPrompt.replace(pos, 10, hostname);
-        }
-    }
-
-    pos = prompt.find("{username}");
-    if (pos != string::npos) {
-        char username[1024];
-        if (getlogin_r(username, sizeof(username)) == 0) {
-            refactoredPrompt.replace(pos, 10, username);
-        }
-    }
-
-    pos = prompt.find("\\033");
-    if (pos != string::npos) {
+    while((pos = refactoredPrompt.find("\\033")) != string::npos)
+    {
         refactoredPrompt.replace(pos, 4, "\033");
     }
 
@@ -97,6 +95,8 @@ int main(int argc, char* argv[]) {
 
     while(true) {
         string refactoredPrompt = getPrompt();
+        refactoredPrompt = getPrompt();
+
         cout << refactoredPrompt + "\033[0m";
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
