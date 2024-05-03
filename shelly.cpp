@@ -80,6 +80,12 @@ string getPrompt()
             refactoredPrompt.replace(pos, 10, username);
         }
     }
+
+    pos = prompt.find("\\033");
+    if (pos != string::npos) {
+        refactoredPrompt.replace(pos, 4, "\033");
+    }
+
     return refactoredPrompt;
 }
 
@@ -91,7 +97,7 @@ int main(int argc, char* argv[]) {
 
     while(true) {
         string refactoredPrompt = getPrompt();
-        cout << '\033' << refactoredPrompt.substr(4) + "\033[0m";
+        cout << refactoredPrompt + "\033[0m";
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
             prompt = input.substr(11);
