@@ -6,6 +6,8 @@ Shelly is a simple shell implemented in C++. It provides basic functionality for
 
 ## Placeholders
 
+Placeholders are temporary text which can be used in the prompt which later replaces by something else.
+
 **Adding custom placeholders is coming soon**
 
 - `{cwd}`: Current working directory.
