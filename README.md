@@ -37,14 +37,17 @@ replace 'X' with a color code
 Shelly has the following built-in commands:
 
 - `set prompt`: Sets the current prompt.
+- `set welcome`: Sets the current welcome message.
+- `disable welcome`: Disables the welcome feature.
 - `cd`: Changes the current directory.
 - `exit`: Exits the shell.
 
 ## TODO
 
-Things that I will do before release.
+Things that I will do before final release.
 
 - Custom placeholders
+- Add aliases
 - Error handling
 - Code cleanup
 
