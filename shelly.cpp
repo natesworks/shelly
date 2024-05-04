@@ -67,16 +67,29 @@ string getPrompt()
     hostname_buffer[sizeof(hostname_buffer) - 1] = '\0';
     std::string hostname(hostname_buffer);
 
-    while ((pos = refactoredPrompt.find("{", pos)) != string::npos) {
-        string placeholder = refactoredPrompt.substr(pos, refactoredPrompt.find('}', pos + 1) - pos + 1);
-        if (placeholder == "{cwd}") {
-        refactoredPrompt.replace(pos, placeholder.length(), filesystem::current_path().string());
-        } else if (placeholder == "{username}") {
-        refactoredPrompt.replace(pos, placeholder.length(), username);
-        } else if (placeholder == "{hostname}") {
-        refactoredPrompt.replace(pos, placeholder.length(), hostname);
+    while (true) {
+        pos = refactoredPrompt.find("{", pos);
+        if(pos != string::npos)
+        {
+            string placeholder = refactoredPrompt.substr(pos, refactoredPrompt.find('}', pos + 1) - pos + 1);
+            if (placeholder == "{cwd}") {
+            refactoredPrompt.replace(pos, placeholder.length(), filesystem::current_path().string());
+            continue;
+            } 
+            if (placeholder == "{username}") {
+            refactoredPrompt.replace(pos, placeholder.length(), username);
+            continue;
+            } 
+            if (placeholder == "{hostname}") {
+            refactoredPrompt.replace(pos, placeholder.length(), hostname);
+            continue;
+            }
+            pos += placeholder.length();
         }
-        pos += placeholder.length();
+        else
+        {
+            break;
+        }
     }
 
     while((pos = refactoredPrompt.find("\\033")) != string::npos)
