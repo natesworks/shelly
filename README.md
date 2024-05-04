@@ -16,7 +16,7 @@ Placeholders are temporary text which are later replaced. They can be used in th
 
 ## Colors
 
-``\033[Xm]``
+``\033[Xm``
 replace 'X' with a color code
 
 | Color Name | Foreground Color Code | Background Color Code |
