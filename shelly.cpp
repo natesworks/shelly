@@ -172,6 +172,9 @@ int main(int argc, char* argv[]) {
         else if (input == "get prompt") {
             cout << prompt << endl;
         }
+        else if (input == "get welcome") {
+            cout << welcome << endl;
+        }
         else if (input.find("echo ") == 0) {
             cout << input.substr(4) << endl;
         }
