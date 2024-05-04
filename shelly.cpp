@@ -12,6 +12,7 @@
 using namespace std;
 
 string prompt;
+string welcome;
 string input;
 
 string getHomeDirectory() {
@@ -19,7 +20,7 @@ string getHomeDirectory() {
     return pw->pw_dir;
 }
 
-int writeConfig(const string& prompt) {
+int writePrompt() {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "prompt";
 
@@ -42,7 +43,7 @@ int writeConfig(const string& prompt) {
     return 1;
 }
 
-int readConfig() {
+int getPrompt() {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "prompt";
 
@@ -55,9 +56,45 @@ int readConfig() {
     return 0;
 }
 
-string getPrompt()
+int writeWelcome() {
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "welcome";
+
+    struct stat st = {0};
+    if (stat(configDir.c_str(), &st) == -1) {
+        if (mkdir(configDir.c_str(), 0700) == -1) {
+            cerr << "Error: Unable to create directory: " << configDir << endl;
+            return 0;
+        }
+    }
+
+    ofstream ofs(configFile);
+    if (!ofs.is_open()) {
+        cerr << "Error: Unable to open config file for writing: " << configFile << endl;
+        return 0;
+    }
+
+    ofs << welcome;
+    ofs.close();
+    return 1;
+}
+
+int getWelcome() {
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "welcome";
+
+    ifstream configFileStream(configFile);
+    if (configFileStream.is_open()) {
+        getline(configFileStream, welcome);
+        configFileStream.close();
+        return 1;
+    }
+    return 0;
+}
+
+string applyPlaceholders(const string& value)
 {
-    string refactoredPrompt = prompt;
+    string newValue = value;
     std::size_t pos = 0;
 
     string username = getlogin();
@@ -68,20 +105,20 @@ string getPrompt()
     std::string hostname(hostname_buffer);
 
     while (true) {
-        pos = refactoredPrompt.find("{", pos);
+        pos = newValue.find("{", pos);
         if(pos != string::npos)
         {
-            string placeholder = refactoredPrompt.substr(pos, refactoredPrompt.find('}', pos + 1) - pos + 1);
+            string placeholder = newValue.substr(pos, newValue.find('}', pos + 1) - pos + 1);
             if (placeholder == "{cwd}") {
-            refactoredPrompt.replace(pos, placeholder.length(), filesystem::current_path().string());
+            newValue.replace(pos, placeholder.length(), filesystem::current_path().string());
             continue;
             } 
             if (placeholder == "{username}") {
-            refactoredPrompt.replace(pos, placeholder.length(), username);
+            newValue.replace(pos, placeholder.length(), username);
             continue;
             } 
             if (placeholder == "{hostname}") {
-            refactoredPrompt.replace(pos, placeholder.length(), hostname);
+            newValue.replace(pos, placeholder.length(), hostname);
             continue;
             }
             pos += placeholder.length();
@@ -92,30 +129,38 @@ string getPrompt()
         }
     }
 
-    while((pos = refactoredPrompt.find("\\033")) != string::npos)
+    while((pos = newValue.find("\\033")) != string::npos)
     {
-        refactoredPrompt.replace(pos, 4, "\033");
+        newValue.replace(pos, 4, "\033");
     }
 
-    return refactoredPrompt;
+    return newValue;
 }
 
 int main(int argc, char* argv[]) {
-    if (!readConfig()) {
+    if (!getPrompt()) {
         cout << "Run \"set prompt\" to set a prompt." << endl;
         prompt = "[{username}@{hostname}]{cwd}% ";
     }
 
-    while(true) {
-        string refactoredPrompt = getPrompt();
-        refactoredPrompt = getPrompt();
+    getWelcome();
+    cout << welcome << endl;
 
-        cout << refactoredPrompt + "\033[0m";
+    while(true) {
+        prompt = applyPlaceholders(prompt);
+
+        cout << prompt + "\033[0m";
         getline(cin, input);
         if (input.find("set prompt ") == 0) {
             prompt = input.substr(11);
-            if (!writeConfig(prompt)) {
+            if (!writePrompt()) {
                 cerr << "Error: Failed to set prompt." << endl;
+            }
+        }
+        else if (input.find("set welcome ") == 0) {
+            welcome = input.substr(12);
+            if (!writeWelcome()) {
+                cerr << "Error: Failed to set welcome message." << endl;
             }
         }
         else if (input == "exit") {
