@@ -40,4 +40,12 @@ Shelly has the following built-in commands:
 - `cd`: Changes the current directory.
 - `exit`: Exits the shell.
 
+## TODO
+
+Things that I will do before release.
+
+- Custom placeholders
+- Error handling
+- Code cleanup
+
 Feel free to contribute to the development of Shelly by submitting pull requests or reporting any issues you encounter.
