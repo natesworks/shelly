@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
     }
 
     getWelcome();
-    cout << welcome << endl;
+    cout << applyPlaceholders(welcome) << endl;
 
     while(true) {
         prompt = applyPlaceholders(prompt);
@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
             cout << prompt << endl;
         }
         else if (input == "get welcome") {
-            cout << welcome << endl;
+            cout << applyPlaceholders(welcome) << endl;
         }
         else if (input.find("echo ") == 0) {
             cout << input.substr(4) << endl;
