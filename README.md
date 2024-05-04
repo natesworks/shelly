@@ -48,7 +48,19 @@ Things that I will do before final release.
 
 - Custom placeholders
 - Add aliases
+- Add startup commands
+- Add command block
 - Error handling
 - Code cleanup
+
+## Command blocks
+
+**Warning!** Command blocks haven't been added yet!
+
+Command blocks can be used in your prompt or welcome message to get the output of a command.
+
+For example:
+
+`Today is: [date -I]` will display for example `Today is: 2024-05-04`. 
 
 Feel free to contribute to the development of Shelly by submitting pull requests or reporting any issues you encounter.
