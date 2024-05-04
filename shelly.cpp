@@ -144,7 +144,10 @@ int main(int argc, char* argv[]) {
     }
 
     getWelcome();
-    cout << applyPlaceholders(welcome) << endl;
+    if(welcome != "")
+    {
+        cout << applyPlaceholders(welcome) << endl;
+    }
 
     while(true) {
         prompt = applyPlaceholders(prompt);
@@ -159,6 +162,13 @@ int main(int argc, char* argv[]) {
         }
         else if (input.find("set welcome ") == 0) {
             welcome = input.substr(12);
+            if (!writeWelcome()) {
+                cerr << "Error: Failed to set welcome message." << endl;
+            }
+        }
+        else if (input == "disable welcome")
+        {
+            welcome = "";
             if (!writeWelcome()) {
                 cerr << "Error: Failed to set welcome message." << endl;
             }
