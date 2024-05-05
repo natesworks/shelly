@@ -15,6 +15,7 @@ string prompt;
 string welcome;
 string input;
 
+// Defining methods
 string applyPlaceholders(const string& value);
 int writePrompt();
 int getPrompt();
@@ -23,11 +24,13 @@ int getWelcome();
 string getHomeDirectory();
 
 int main(int argc, char* argv[]) {
+    // Get prompt from configuration and if not set use default prompt
     if (!getPrompt()) {
         cout << "Run \"set prompt\" to set a prompt." << endl;
         prompt = "[{username}@{hostname}]{cwd}% ";
     }
 
+    // Get welcome from configuration and apply placeholders and colors
     getWelcome();
     if(welcome != "")
     {
@@ -35,6 +38,7 @@ int main(int argc, char* argv[]) {
     }
 
     while(true) {
+        // Apply placeholders and colors from prompt
         prompt = applyPlaceholders(prompt);
 
         cout << prompt + "\033[0m";
@@ -99,6 +103,7 @@ int main(int argc, char* argv[]) {
     return 1;
 }
 
+// Aplies placeholders and colors
 string applyPlaceholders(const string& value)
 {
     string newValue = value;
@@ -143,6 +148,8 @@ string applyPlaceholders(const string& value)
     return newValue;
 }
 
+
+// Writes the welcome message to configuration
 int writeWelcome() {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "welcome";
@@ -166,6 +173,7 @@ int writeWelcome() {
     return 1;
 }
 
+// Gets the welcome message from the configuration
 int getWelcome() {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "welcome";
@@ -179,6 +187,7 @@ int getWelcome() {
     return 0;
 }
 
+// Writes the prompt to configuration
 int writePrompt() {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "prompt";
@@ -202,6 +211,7 @@ int writePrompt() {
     return 1;
 }
 
+// Gets the prompt from the configuration
 int getPrompt() {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "prompt";
@@ -215,6 +225,7 @@ int getPrompt() {
     return 0;
 }
 
+// Gets the home directory
 string getHomeDirectory() {
     struct passwd *pw = getpwuid(getuid());
     return pw->pw_dir;
