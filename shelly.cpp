@@ -99,8 +99,12 @@ int executeCommand(string command)
 
         pid_t pid = fork();
         if (pid == 0) {
-            execvp(args[0], args.data());
-            exit(1);
+            if (execvp(args[0], const_cast<char* const*>(args.data())) == -1) {
+            if (errno == ENOENT)
+            {
+                cerr << "Error: Command '" << command << "' not found." << endl;
+            }
+            }
         } else if (pid > 0) {
             wait(NULL);
         } else {
