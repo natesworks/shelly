@@ -15,127 +15,12 @@ string prompt;
 string welcome;
 string input;
 
-string getHomeDirectory() {
-    struct passwd *pw = getpwuid(getuid());
-    return pw->pw_dir;
-}
-
-int writePrompt() {
-    string configDir = getHomeDirectory() + "/.config/shelly/";
-    string configFile = configDir + "prompt";
-
-    struct stat st = {0};
-    if (stat(configDir.c_str(), &st) == -1) {
-        if (mkdir(configDir.c_str(), 0700) == -1) {
-            cerr << "Error: Unable to create directory: " << configDir << endl;
-            return 0;
-        }
-    }
-
-    ofstream ofs(configFile);
-    if (!ofs.is_open()) {
-        cerr << "Error: Unable to open config file for writing: " << configFile << endl;
-        return 0;
-    }
-
-    ofs << prompt;
-    ofs.close();
-    return 1;
-}
-
-int getPrompt() {
-    string configDir = getHomeDirectory() + "/.config/shelly/";
-    string configFile = configDir + "prompt";
-
-    ifstream configFileStream(configFile);
-    if (configFileStream.is_open()) {
-        getline(configFileStream, prompt);
-        configFileStream.close();
-        return 1;
-    }
-    return 0;
-}
-
-int writeWelcome() {
-    string configDir = getHomeDirectory() + "/.config/shelly/";
-    string configFile = configDir + "welcome";
-
-    struct stat st = {0};
-    if (stat(configDir.c_str(), &st) == -1) {
-        if (mkdir(configDir.c_str(), 0700) == -1) {
-            cerr << "Error: Unable to create directory: " << configDir << endl;
-            return 0;
-        }
-    }
-
-    ofstream ofs(configFile);
-    if (!ofs.is_open()) {
-        cerr << "Error: Unable to open config file for writing: " << configFile << endl;
-        return 0;
-    }
-
-    ofs << welcome;
-    ofs.close();
-    return 1;
-}
-
-int getWelcome() {
-    string configDir = getHomeDirectory() + "/.config/shelly/";
-    string configFile = configDir + "welcome";
-
-    ifstream configFileStream(configFile);
-    if (configFileStream.is_open()) {
-        getline(configFileStream, welcome);
-        configFileStream.close();
-        return 1;
-    }
-    return 0;
-}
-
-string applyPlaceholders(const string& value)
-{
-    string newValue = value;
-    std::size_t pos = 0;
-
-    string username = getlogin();
-
-    char hostname_buffer[1024];
-    gethostname(hostname_buffer, sizeof(hostname_buffer) - 1);
-    hostname_buffer[sizeof(hostname_buffer) - 1] = '\0';
-    std::string hostname(hostname_buffer);
-
-    while (true) {
-        pos = newValue.find("{", pos);
-        if(pos != string::npos)
-        {
-            string placeholder = newValue.substr(pos, newValue.find('}', pos + 1) - pos + 1);
-            if (placeholder == "{cwd}") {
-            newValue.replace(pos, placeholder.length(), filesystem::current_path().string());
-            continue;
-            } 
-            if (placeholder == "{username}") {
-            newValue.replace(pos, placeholder.length(), username);
-            continue;
-            } 
-            if (placeholder == "{hostname}") {
-            newValue.replace(pos, placeholder.length(), hostname);
-            continue;
-            }
-            pos += placeholder.length();
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    while((pos = newValue.find("\\033")) != string::npos)
-    {
-        newValue.replace(pos, 4, "\033");
-    }
-
-    return newValue;
-}
+string applyPlaceholders(const string& value);
+int writePrompt();
+int getPrompt();
+int writeWelcome();
+int getWelcome();
+string getHomeDirectory();
 
 int main(int argc, char* argv[]) {
     if (!getPrompt()) {
@@ -212,4 +97,125 @@ int main(int argc, char* argv[]) {
         }
     }
     return 1;
+}
+
+string applyPlaceholders(const string& value)
+{
+    string newValue = value;
+    std::size_t pos = 0;
+
+    string username = getlogin();
+
+    char hostname_buffer[1024];
+    gethostname(hostname_buffer, sizeof(hostname_buffer) - 1);
+    hostname_buffer[sizeof(hostname_buffer) - 1] = '\0';
+    std::string hostname(hostname_buffer);
+
+    while (true) {
+        pos = newValue.find("{", pos);
+        if(pos != string::npos)
+        {
+            string placeholder = newValue.substr(pos, newValue.find('}', pos + 1) - pos + 1);
+            if (placeholder == "{cwd}") {
+                newValue.replace(pos, placeholder.length(), filesystem::current_path().string());
+            } 
+            else if (placeholder == "{username}")
+            {
+                newValue.replace(pos, placeholder.length(), username);
+            } 
+            else if (placeholder == "{hostname}")
+            {
+                newValue.replace(pos, placeholder.length(), hostname);
+            }
+            pos += placeholder.length();
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    while((pos = newValue.find("\\033")) != string::npos)
+    {
+        newValue.replace(pos, 4, "\033");
+    }
+
+    return newValue;
+}
+
+int writeWelcome() {
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "welcome";
+
+    struct stat st = {0};
+    if (stat(configDir.c_str(), &st) == -1) {
+        if (mkdir(configDir.c_str(), 0700) == -1) {
+            cerr << "Error: Unable to create directory: " << configDir << endl;
+            return 0;
+        }
+    }
+
+    ofstream ofs(configFile);
+    if (!ofs.is_open()) {
+        cerr << "Error: Unable to open config file for writing: " << configFile << endl;
+        return 0;
+    }
+
+    ofs << welcome;
+    ofs.close();
+    return 1;
+}
+
+int getWelcome() {
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "welcome";
+
+    ifstream configFileStream(configFile);
+    if (configFileStream.is_open()) {
+        getline(configFileStream, welcome);
+        configFileStream.close();
+        return 1;
+    }
+    return 0;
+}
+
+int writePrompt() {
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "prompt";
+
+    struct stat st = {0};
+    if (stat(configDir.c_str(), &st) == -1) {
+        if (mkdir(configDir.c_str(), 0700) == -1) {
+            cerr << "Error: Unable to create directory: " << configDir << endl;
+            return 0;
+        }
+    }
+
+    ofstream ofs(configFile);
+    if (!ofs.is_open()) {
+        cerr << "Error: Unable to open config file for writing: " << configFile << endl;
+        return 0;
+    }
+
+    ofs << prompt;
+    ofs.close();
+    return 1;
+}
+
+int getPrompt() {
+    string configDir = getHomeDirectory() + "/.config/shelly/";
+    string configFile = configDir + "prompt";
+
+    ifstream configFileStream(configFile);
+    if (configFileStream.is_open()) {
+        getline(configFileStream, prompt);
+        configFileStream.close();
+        return 1;
+    }
+    return 0;
+}
+
+string getHomeDirectory() {
+    struct passwd *pw = getpwuid(getuid());
+    return pw->pw_dir;
 }
