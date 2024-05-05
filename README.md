@@ -50,8 +50,7 @@ Things that I will do before final release.
 - Add aliases
 - Add startup commands
 - Add command block
-- Error handling
-- Code cleanup
+- Improve builtin commands
 
 ## Command blocks
 
