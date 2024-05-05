@@ -16,14 +16,16 @@ string welcome;
 string input;
 
 // Defining methods
+string getHomeDirectory();
 string applyPlaceholders(const string& value);
-int writePrompt();
-int getPrompt();
+int executeCommand(string command);
 int writeWelcome();
 int getWelcome();
-string getHomeDirectory();
+int writePrompt();
+int getPrompt();
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     // Get prompt from configuration and if not set use default prompt
     if (!getPrompt()) {
         cout << "Run \"set prompt\" to set a prompt." << endl;
@@ -37,70 +39,84 @@ int main(int argc, char* argv[]) {
         cout << applyPlaceholders(welcome) << endl;
     }
 
-    while(true) {
+    while(true)
+    {
         // Apply placeholders and colors from prompt
         prompt = applyPlaceholders(prompt);
 
         cout << prompt + "\033[0m";
         getline(cin, input);
-        if (input.find("set prompt ") == 0) {
-            prompt = input.substr(11);
-            if (!writePrompt()) {
-                cerr << "Error: Failed to set prompt." << endl;
-            }
-        }
-        else if (input.find("set welcome ") == 0) {
-            welcome = input.substr(12);
-            if (!writeWelcome()) {
-                cerr << "Error: Failed to set welcome message." << endl;
-            }
-        }
-        else if (input == "disable welcome")
-        {
-            welcome = "";
-            if (!writeWelcome()) {
-                cerr << "Error: Failed to set welcome message." << endl;
-            }
-        }
-        else if (input == "exit") {
-            exit(1);
-        }
-        else if (input.find("cd ") == 0) {
-            chdir(input.substr(3).data());
-        }
-        else if (input == "get prompt") {
-            cout << prompt << endl;
-        }
-        else if (input == "get welcome") {
-            cout << applyPlaceholders(welcome) << endl;
-        }
-        else if (input.find("echo ") == 0) {
-            cout << input.substr(4) << endl;
-        }
-        else if (!input.empty()) {
-            istringstream iss(input);
-            vector<char*> args;
-            string arg;
-            while (iss >> arg) {
-                args.push_back(strdup(arg.c_str()));
-            }
-            args.push_back(nullptr); 
+        executeCommand(input);
+    }
+}
 
-            pid_t pid = fork();
-            if (pid == 0) {
-                execvp(args[0], args.data());
-                exit(1);
-            } else if (pid > 0) {
-                wait(NULL);
-            } else {
-                cout << "Failed to fork process." << endl;
-            }
-            for (auto& arg : args) {
-                free(arg);
-            }
+int executeCommand(string command)
+{
+    if (command.find("set prompt ") == 0)
+    {
+        prompt = command.substr(11);
+        if (!writePrompt())
+        {
+            cerr << "Error: Failed to set prompt." << endl;
+        }
+    }
+    else if (command.find("set welcome ") == 0) {
+        welcome = command.substr(12);
+        if (!writeWelcome()) {
+            cerr << "Error: Failed to set welcome message." << endl;
+        }
+    }
+    else if (command == "disable welcome")
+    {
+        welcome = "";
+        if (!writeWelcome()) {
+            cerr << "Error: Failed to set welcome message." << endl;
+        }
+    }
+    else if (command == "exit") {
+        exit(1);
+    }
+    else if (command.find("cd ") == 0) {
+        chdir(command.substr(3).data());
+    }
+    else if (command == "get prompt") {
+        cout << prompt << endl;
+    }
+    else if (command == "get welcome") {
+        cout << applyPlaceholders(welcome) << endl;
+    }
+    else if (command.find("echo ") == 0) {
+        cout << command.substr(4) << endl;
+    }
+    else if (!command.empty()) {
+        istringstream iss(command);
+        vector<char*> args;
+        string arg;
+        while (iss >> arg) {
+            args.push_back(strdup(arg.c_str()));
+        }
+        args.push_back(nullptr); 
+
+        pid_t pid = fork();
+        if (pid == 0) {
+            execvp(args[0], args.data());
+            exit(1);
+        } else if (pid > 0) {
+            wait(NULL);
+        } else {
+            cout << "Failed to fork process." << endl;
+        }
+        for (auto& arg : args) {
+            free(arg);
         }
     }
     return 1;
+}
+
+// Gets the home directory
+string getHomeDirectory() {
+    struct passwd *pw = getpwuid(getuid());
+    return pw->pw_dir;
 }
 
 // Aplies placeholders and colors
@@ -150,7 +166,8 @@ string applyPlaceholders(const string& value)
 
 
 // Writes the welcome message to configuration
-int writeWelcome() {
+int writeWelcome()
+{
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "welcome";
 
@@ -174,7 +191,8 @@ int writeWelcome() {
 }
 
 // Gets the welcome message from the configuration
-int getWelcome() {
+int getWelcome()
+{
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "welcome";
 
@@ -188,7 +206,8 @@ int getWelcome() {
 }
 
 // Writes the prompt to configuration
-int writePrompt() {
+int writePrompt()
+{
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "prompt";
 
@@ -212,7 +231,8 @@ int writePrompt() {
 }
 
 // Gets the prompt from the configuration
-int getPrompt() {
+int getPrompt()
+{
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "prompt";
 
@@ -223,10 +243,4 @@ int getPrompt() {
         return 1;
     }
     return 0;
-}
-
-// Gets the home directory
-string getHomeDirectory() {
-    struct passwd *pw = getpwuid(getuid());
-    return pw->pw_dir;
 }
