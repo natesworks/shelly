@@ -32,6 +32,24 @@ Placeholders are temporary text which are later replaced. They can be used in th
 - `{username}`: Username of the current user.
 - `{hostname}`: Hostname (PC name).
 
+## Adding placeholders
+
+To add a placeholder you can use the `placeholder` command.
+
+**Note that there is no & before the command. That is because it is used to run a command without returning output**
+
+`placeholder add name <command>`
+
+Replace `name` with the name of the placeholder and `command` with the command to run to get the value.
+
+For example here's a placeholder that gets the current time:
+
+`placeholder add time <date -I>`
+
+You can also add static text:
+
+`placeholder add time Time: <date -I>`
+
 ## Colors
 
 `\033[Xm`
@@ -60,21 +78,3 @@ The welcome message is the message sent when you start the shell. To run a comma
 To change the welcome message you can use `set welcome Hello world!`
 
 Replace `Hello world!`with your actual prompt.
-
-## Adding placeholders
-
-To add a placeholder you can use the `placeholder` command.
-
-**Note that there is no & before the command. That is because it is used to run a command without returning output**
-
-`placeholder add name <command>`
-
-Replace `name` with the name of the placeholder and `command` with the command to run to get the value.
-
-For example here's a placeholder that gets the current time:
-
-`placeholder add time <date -I>`
-
-You can also add static text:
-
-`placeholder add time Time: <date -I>`
