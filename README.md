@@ -36,8 +36,6 @@ Placeholders are temporary text which are later replaced. They can be used in th
 
 To add a placeholder you can use the `placeholder` command.
 
-**Note that there is no & before the command. That is because it is used to run a command without returning output**
-
 `placeholder add name <command>`
 
 Replace `name` with the name of the placeholder and `command` with the command to run to get the value.
@@ -71,7 +69,7 @@ Replace 'X' with a color code from the table below:
 
 ## Welcome message
 
-The welcome message is the message sent when you start the shell. To run a command you can use `<&command>`. Make sure to replace `command` with the actual command.
+The welcome message is the message sent when you start the shell. To run a command you can use `<command>`. Make sure to replace `command` with the actual command.
 
 **Setting welcome message**
 
