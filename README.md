@@ -65,6 +65,8 @@ Replace `Hello world!`with your actual prompt.
 
 To add a placeholder you can use the `placeholder` command.
 
+**Note that there is no & before the command that is because & is used to run without returning output**
+
 `placeholder add name <command>`
 
 Replace `name` with the name of the placeholder and `command` with the command to run to get the value.
