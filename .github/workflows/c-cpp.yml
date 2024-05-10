@@ -1,0 +1,22 @@
+name: Compile
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install g++
+        run: sudo apt-get update && sudo apt-get install g++ -y
+
+      - name: Compile
+        run: g++ shelly.cpp -o shelly
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: shelly
+          path: shelly
