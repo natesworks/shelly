@@ -19,6 +19,8 @@ string input;
 string getHomeDirectory();
 string applyPlaceholders(const string &value);
 int executeCommand(string command);
+int executeCommandFromFile(string file);
+int set(string parameters);
 int writeWelcome();
 int getWelcome();
 int writePrompt();
@@ -42,97 +44,97 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        // Apply placeholders and colors from prompt
-        prompt = applyPlaceholders(prompt);
-
-        cout << prompt + "\033[0m";
+        cout << applyPlaceholders(prompt) + "\033[0m";
         getline(cin, input);
         executeCommand(input);
     }
 }
 
+// Executes a command
 int executeCommand(string command)
 {
-    if (command.find("set prompt ") == 0)
-    {
-        prompt = command.substr(11);
-        if (!writePrompt())
-        {
-            cerr << "Error: Failed to set prompt." << endl;
-        }
-    }
-    else if (command.find("set welcome ") == 0)
-    {
-        welcome = command.substr(12);
-        if (!writeWelcome())
-        {
-            cerr << "Error: Failed to set welcome message." << endl;
-        }
-    }
-    else if (command == "disable welcome")
-    {
-        welcome = "";
-        if (!writeWelcome())
-        {
-            cerr << "Error: Failed to set welcome message." << endl;
-        }
-    }
-    else if (command == "exit")
-    {
-        exit(1);
-    }
-    else if (command.find("cd ") == 0)
+    if (command.find("cd ") == 0)
     {
         chdir(command.substr(3).data());
     }
-    else if (command == "get prompt")
+    else if (command.find("set") == 0)
     {
-        cout << prompt << endl;
-    }
-    else if (command == "get welcome")
-    {
-        cout << applyPlaceholders(welcome) << endl;
-    }
-    else if (command.find("echo ") == 0)
-    {
-        cout << command.substr(4) << endl;
-    }
-    else if (!command.empty())
-    {
-        istringstream iss(command);
-        vector<char *> args;
-        string arg;
-        while (iss >> arg)
+        if (command.size() >= 4)
         {
-            args.push_back(strdup(arg.c_str()));
-        }
-        args.push_back(nullptr);
-
-        pid_t pid = fork();
-        if (pid == 0)
-        {
-            if (execvp(args[0], const_cast<char *const *>(args.data())) == -1)
-            {
-                if (errno == ENOENT)
-                {
-                    cerr << "Error: Command '" << command << "' not found." << endl;
-                }
-            }
-        }
-        else if (pid > 0)
-        {
-            wait(NULL);
+            set(command.substr(4).data());
         }
         else
         {
-            cout << "Failed to fork process." << endl;
-        }
-        for (auto &arg : args)
-        {
-            free(arg);
+            set("");
         }
     }
-    return 1;
+    else if (command.find("exit") == 0)
+    {
+        int exitcode = 1;
+        if (command.size() > 5)
+        {
+            exitcode = stoi(command.substr(5));
+        }
+        exit(exitcode);
+    }
+    else
+    {
+        executeCommandFromFile(command);
+    }
+    return 0;
+}
+
+// Executes a file
+int executeCommandFromFile(string file)
+{
+    istringstream iss(file);
+    vector<char *> args;
+    string arg;
+    while (iss >> arg)
+    {
+        args.push_back(strdup(arg.c_str()));
+    }
+    args.push_back(nullptr);
+
+    pid_t pid = fork();
+    if (pid == 0)
+    {
+        if (execvp(args[0], const_cast<char *const *>(args.data())) == -1)
+        {
+            if (errno == ENOENT)
+            {
+                cerr << "Error: Command '" << file << "' not found." << endl;
+            }
+        }
+    }
+    else if (pid > 0)
+    {
+        wait(NULL);
+    }
+    else
+    {
+        cout << "Failed to fork process." << endl;
+    }
+    for (auto &arg : args)
+    {
+        free(arg);
+    }
+    return 0;
+}
+
+int set(string parameters)
+{
+    if (parameters.find("prompt ") == 0)
+    {
+        prompt = parameters.substr(7);
+        writePrompt();
+    }
+    if (parameters.find("welcome ") == 0)
+    {
+        welcome = parameters.substr(8);
+        writeWelcome();
+    }
+    return 0;
 }
 
 // Gets the home directory
@@ -146,34 +148,49 @@ string getHomeDirectory()
 string applyPlaceholders(const string &value)
 {
     string newValue = value;
-    std::size_t pos = 0;
+    size_t pos = 0;
 
     string username = getlogin();
 
     char hostname_buffer[1024];
     gethostname(hostname_buffer, sizeof(hostname_buffer) - 1);
     hostname_buffer[sizeof(hostname_buffer) - 1] = '\0';
-    std::string hostname(hostname_buffer);
+    string hostname(hostname_buffer);
 
     while (true)
     {
         pos = newValue.find("{", pos);
         if (pos != string::npos)
         {
-            string placeholder = newValue.substr(pos, newValue.find('}', pos + 1) - pos + 1);
-            if (placeholder == "{cwd}")
+            size_t endPos = newValue.find('}', pos + 1);
+            if (endPos != string::npos)
             {
-                newValue.replace(pos, placeholder.length(), filesystem::current_path().string());
+                string placeholder = newValue.substr(pos, endPos - pos + 1);
+                if (placeholder == "{cwd}")
+                {
+                    string cwd = filesystem::current_path().string();
+                    newValue.replace(pos, placeholder.length(), cwd);
+                    pos += cwd.length();
+                }
+                else if (placeholder == "{username}")
+                {
+                    newValue.replace(pos, placeholder.length(), username);
+                    pos += username.length();
+                }
+                else if (placeholder == "{hostname}")
+                {
+                    newValue.replace(pos, placeholder.length(), hostname);
+                    pos += hostname.length();
+                }
+                else
+                {
+                    ++pos;
+                }
             }
-            else if (placeholder == "{username}")
+            else
             {
-                newValue.replace(pos, placeholder.length(), username);
+                ++pos;
             }
-            else if (placeholder == "{hostname}")
-            {
-                newValue.replace(pos, placeholder.length(), hostname);
-            }
-            pos += placeholder.length();
         }
         else
         {
@@ -185,7 +202,6 @@ string applyPlaceholders(const string &value)
     {
         newValue.replace(pos, 4, "\033");
     }
-
     return newValue;
 }
 
@@ -201,7 +217,7 @@ int writeWelcome()
         if (mkdir(configDir.c_str(), 0700) == -1)
         {
             cerr << "Error: Unable to create directory: " << configDir << endl;
-            return 0;
+            return 1;
         }
     }
 
@@ -209,12 +225,12 @@ int writeWelcome()
     if (!ofs.is_open())
     {
         cerr << "Error: Unable to open config file for writing: " << configFile << endl;
-        return 0;
+        return 1;
     }
 
     ofs << welcome;
     ofs.close();
-    return 1;
+    return 0;
 }
 
 // Gets the welcome message from the configuration
@@ -228,9 +244,9 @@ int getWelcome()
     {
         getline(configFileStream, welcome);
         configFileStream.close();
-        return 1;
+        return 0;
     }
-    return 0;
+    return 1;
 }
 
 // Writes the prompt to configuration
@@ -245,7 +261,7 @@ int writePrompt()
         if (mkdir(configDir.c_str(), 0700) == -1)
         {
             cerr << "Error: Unable to create directory: " << configDir << endl;
-            return 0;
+            return 1;
         }
     }
 
@@ -253,12 +269,12 @@ int writePrompt()
     if (!ofs.is_open())
     {
         cerr << "Error: Unable to open config file for writing: " << configFile << endl;
-        return 0;
+        return 1;
     }
 
     ofs << prompt;
     ofs.close();
-    return 1;
+    return 0;
 }
 
 // Gets the prompt from the configuration
@@ -272,7 +288,7 @@ int getPrompt()
     {
         getline(configFileStream, prompt);
         configFileStream.close();
-        return 1;
+        return 0;
     }
-    return 0;
+    return 1;
 }
