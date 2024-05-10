@@ -10,8 +10,6 @@ Shelly provides the following built-in commands.
 
 - `set` Allows changing different settings.
 - `cd` Changes the current directory
-- `alias` Allows adding aliases
-- `placeholder` Allows adding/removing placeholders
 - `exit` Exits the shell
 
 ## Prompt
@@ -31,23 +29,6 @@ Placeholders are temporary text which are later replaced. They can be used in th
 - `{cwd}`: Current working directory.
 - `{username}`: Username of the current user.
 - `{hostname}`: Hostname (PC name).
-
-## Adding placeholders
-
-To add a placeholder you can use the `placeholder` command.
-
-`placeholder add name <command>`
-
-Replace `name` with the name of the placeholder and `command` with the command to run to get the value.
-
-For example here's a placeholder that gets the current time:
-
-`placeholder add time <date -I>`
-
-You can also add static text:
-
-`placeholder add time Time: <date -I>`
-
 ## Colors
 
 `\033[Xm`
