@@ -29,10 +29,11 @@ int getPrompt();
 int main(int argc, char *argv[])
 {
     // Get prompt from configuration and if not set use default prompt
-    if (!getPrompt())
+    if (getPrompt())
     {
         cout << "Run \"set prompt\" to set a prompt." << endl;
         prompt = "[{username}@{hostname}]{cwd}% ";
+        writePrompt();
     }
 
     // Get welcome from configuration and apply placeholders and colors
@@ -122,6 +123,7 @@ int executeCommandFromFile(string file)
     return 0;
 }
 
+// Change settings
 int set(string parameters)
 {
     if (parameters.find("prompt ") == 0)
