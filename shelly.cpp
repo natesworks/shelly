@@ -26,6 +26,7 @@ int writeWelcome();
 int getWelcome();
 int writePrompt();
 int getPrompt();
+int createConfigDir();
 
 int main(int argc, char *argv[])
 {
@@ -237,17 +238,7 @@ int writeWelcome()
 {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "welcome";
-
-    struct stat st = {0};
-    if (stat(configDir.c_str(), &st) == -1)
-    {
-        if (mkdir(configDir.c_str(), 0700) == -1)
-        {
-            cerr << "Error: Unable to create directory: " << configDir << endl;
-            return 1;
-        }
-    }
-
+    
     ofstream ofs(configFile);
     if (!ofs.is_open())
     {
@@ -266,13 +257,8 @@ int getWelcome()
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "welcome";
 
-    ifstream configFileStream(configFile);
-    if (configFileStream.is_open())
-    {
-        getline(configFileStream, welcome);
-        configFileStream.close();
-        return 0;
-    }
+    createConfigDir();
+
     return 1;
 }
 
@@ -318,4 +304,32 @@ int getPrompt()
         return 0;
     }
     return 1;
+}
+
+// Creates the config directory
+int createConfigDir()
+{
+    string configDir = getHomeDirectory() + "/.config/";
+    string shellyConfigDir = getHomeDirectory() + "/.config/shelly/";
+
+    struct stat st = {0};
+    if (stat(configDir.c_str(), &st) == -1)
+    {
+        if (mkdir(configDir.c_str(), 0700) == -1)
+        {
+            cerr << "Error: Unable to create directory: " << configDir << endl;
+            return 1;
+        }
+    }
+
+    if (stat(configDir.c_str(), &st) == -1)
+    {
+        if (mkdir(shellyConfigDir.c_str(), 0700) == -1)
+        {
+            cerr << "Error: Unable to create directory: " << shellyConfigDir << endl;
+            return 1;
+        }
+    }
+    
+    return 0;
 }
