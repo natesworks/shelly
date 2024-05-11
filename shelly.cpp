@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     if (getPrompt())
     {
         cout << "Run \"set prompt\" to set a prompt." << endl;
-        prompt = "[{username}@{hostname}]{cwd}% ";
+        prompt = "\033[36m[{username}@{hostname}] \033[37m{cwd} \033[36m$ ";
         writePrompt();
     }
 
