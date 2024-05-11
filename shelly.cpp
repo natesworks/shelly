@@ -159,12 +159,15 @@ string applyPlaceholders(const string &value)
     hostname_buffer[sizeof(hostname_buffer) - 1] = '\0';
     string hostname(hostname_buffer);
 
-    while (true)
+    while (pos < newValue.length())
     {
-        pos = newValue.find("{", pos);
-        if (pos != string::npos)
+        if (newValue[pos] == '{')
         {
             size_t endPos = newValue.find('}', pos + 1);
+            if (pos > 0 && newValue[pos - 1] == '\\') {
+                ++pos;
+                continue;
+            }
             if (endPos != string::npos)
             {
                 string placeholder = newValue.substr(pos, endPos - pos + 1);
@@ -172,38 +175,38 @@ string applyPlaceholders(const string &value)
                 {
                     string cwd = filesystem::current_path().string();
                     newValue.replace(pos, placeholder.length(), cwd);
-                    pos += cwd.length();
+                    pos += cwd.length() - 1;
                 }
                 else if (placeholder == "{username}")
                 {
                     newValue.replace(pos, placeholder.length(), username);
-                    pos += username.length();
+                    pos += username.length() - 1;
                 }
                 else if (placeholder == "{hostname}")
                 {
                     newValue.replace(pos, placeholder.length(), hostname);
-                    pos += hostname.length();
-                }
-                else
-                {
-                    ++pos;
+                    pos += hostname.length() - 1;
                 }
             }
-            else
-            {
-                ++pos;
-            }
         }
-        else
-        {
-            break;
-        }
+        ++pos;
     }
 
     while ((pos = newValue.find("\\033")) != string::npos)
     {
         newValue.replace(pos, 4, "\033");
     }
+
+    while ((pos = newValue.find("\\n")) != string::npos)
+    {
+        newValue.replace(pos, 3, "\n");
+    }
+
+    while((pos = newValue.find("\\")) != string::npos)
+    {
+        newValue.replace(pos, 1, "");
+    }
+
     return newValue;
 }
 
