@@ -18,6 +18,7 @@ string input;
 // Defining methods
 string getHomeDirectory();
 string applyPlaceholders(const string &value);
+int shell();
 int executeCommand(string command);
 int executeCommandFromFile(string file);
 int set(string parameters);
@@ -28,6 +29,20 @@ int getPrompt();
 
 int main(int argc, char *argv[])
 {
+    if(argc >= 3 && strcmp(argv[1], "-c") == 0)
+    {
+        string command;
+        for(int args = 2; args < argc; args++)
+        {
+            cout << args;
+            command.append(argv[args]);
+            command.append(" ");
+        }
+        executeCommand(command);
+        cout << command;
+        exit(0);
+    }
+
     // Get prompt from configuration and if not set use default prompt
     if (getPrompt())
     {
@@ -45,10 +60,17 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        cout << applyPlaceholders(prompt) + "\033[0m";
-        getline(cin, input);
-        executeCommand(input);
+        shell();
     }
+}
+
+// Prompt and input handler
+int shell()
+{
+    cout << applyPlaceholders(prompt) + "\033[0m";
+    getline(cin, input);
+    executeCommand(input);
+    return 0;
 }
 
 // Executes a command
