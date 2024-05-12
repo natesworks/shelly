@@ -21,6 +21,7 @@ string formatText(const string &value);
 int shell();
 int executeCommand(string command);
 int executeCommandFromFile(string file);
+int echo(string text);
 int set(string parameters);
 int writeWelcome();
 int getWelcome();
@@ -101,6 +102,10 @@ int executeCommand(string command)
         }
         exit(exitcode);
     }
+    else if (command.find("echo") == 0)
+    {
+        echo(command.substr(5).data());
+    }
     else if (command != "")
     {
         executeCommandFromFile(command);
@@ -144,6 +149,14 @@ int executeCommandFromFile(string file)
     {
         free(arg);
     }
+    return 0;
+}
+
+// Writes text
+int echo(string text)
+{
+    string formattedText = formatText(text);
+    cout << formattedText << endl;
     return 0;
 }
 

@@ -10,6 +10,7 @@ Shelly provides the following built-in commands.
 
 - `set` Allows changing different settings.
 - `cd` Changes the current directory
+- `echo` Writes text to the console
 - `exit` Exits the shell
 
 ## Prompt
