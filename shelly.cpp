@@ -101,7 +101,7 @@ int executeCommand(string command)
         }
         exit(exitcode);
     }
-    else
+    else if (command != "")
     {
         executeCommandFromFile(command);
     }
