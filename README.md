@@ -51,7 +51,7 @@ Replace 'X' with a color code from the table below:
 
 ## Welcome message
 
-The welcome message is the message sent when you start the shell. To run a command you can use `<command>`. Make sure to replace `command` with the actual command.
+The welcome message is the message sent when you start the shell.
 
 **Setting welcome message**
 
