@@ -33,9 +33,8 @@ Placeholders are a symbolic representation of something that will later be repla
 - `{hostname}`: Hostname (PC name).
 ## Colors
 
-`\033[Xm`
 
-You can use the \\033[Xm sequence to adjust the foreground and background colors of your prompt or welcome message text. Simply substitute 'X' with the appropriate color code from the provided table:
+You can use the `\\033[Xm` sequence to adjust the foreground and background colors of your prompt or welcome message text. Simply substitute 'X' with the appropriate color code from the provided table:
 
 | Color Name | Foreground Color Code | Background Color Code |
 | :--------- | :-------------------- | :-------------------- |
