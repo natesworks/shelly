@@ -8,10 +8,11 @@ Shelly is a simple shell implemented in C++. It provides basic functionality for
 
 Shelly provides the following built-in commands.
 
-- `set` Allows changing different settings.
-- `cd` Changes the current directory
-- `echo` Writes text to the console
-- `exit` Exits the shell
+- `set`: Allows changing different settings.
+- `cd`: Changes the current directory
+- `echo`: Writes text to the console
+- `help`: Shows a help message
+- `exit`: Exits the shell
 
 ## Prompt
 
@@ -25,7 +26,7 @@ Replace `$` with your actual prompt.
 
 ## Placeholders
 
-Placeholders are temporary text which are later replaced. They can be used in the prompt or welcome message.
+Placeholders are a symbolic representation of something that will later be replaced with it's actual value later by the shell. This can be used in your prompt or welcome message.
 
 - `{cwd}`: Current working directory.
 - `{username}`: Username of the current user.
@@ -34,7 +35,7 @@ Placeholders are temporary text which are later replaced. They can be used in th
 
 `\033[Xm`
 
-Replace 'X' with a color code from the table below:
+You can use the \\033[Xm sequence to adjust the foreground and background colors of your prompt or welcome message text. Simply substitute 'X' with the appropriate color code from the provided table:
 
 | Color Name | Foreground Color Code | Background Color Code |
 | :--------- | :-------------------- | :-------------------- |
