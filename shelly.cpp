@@ -216,19 +216,34 @@ string applyPlaceholders(const string &value)
         ++pos;
     }
 
-    while ((pos = newValue.find("\\033")) != string::npos)
+    pos = 0;
+    while ((pos = newValue.find("\\n", pos)) != string::npos)
     {
-        newValue.replace(pos, 4, "\033");
+        if (pos == 0 || (pos > 0 && newValue[pos - 1] != '\\')) {
+            newValue.replace(pos, 2, "\n");
+        }
+        ++pos;
     }
 
-    while ((pos = newValue.find("\\n")) != string::npos)
+    pos = 0;
+    while ((pos = newValue.find("\\033", pos)) != string::npos)
     {
-        newValue.replace(pos, 3, "\n");
+        newValue.replace(pos, 4, "\033[");
+        pos += 2;
     }
 
-    while((pos = newValue.find("\\")) != string::npos)
+    pos = 0;
+    while ((pos = newValue.find("\\{", pos)) != string::npos)
     {
-        newValue.replace(pos, 1, "");
+        newValue.replace(pos, 2, "{");
+        ++pos;
+    }
+
+    pos = 0;
+    while ((pos = newValue.find("\\\\", pos)) != string::npos)
+    {
+        newValue.replace(pos, 2, "\\");
+        ++pos;
     }
 
     return newValue;
