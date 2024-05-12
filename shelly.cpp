@@ -259,6 +259,13 @@ int getWelcome()
     string configFile = configDir + "welcome";
 
     createConfigDir();
+    ifstream configFileStream(configFile);
+    if (configFileStream.is_open())
+    {
+        getline(configFileStream, welcome);
+        configFileStream.close();
+        return 0;
+    }
 
     return 1;
 }
