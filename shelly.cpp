@@ -128,6 +128,7 @@ int executeCommandFromFile(string file)
             if (errno == ENOENT)
             {
                 cerr << "Error: Command '" << file << "' not found." << endl;
+                exit(1);
             }
         }
     }
