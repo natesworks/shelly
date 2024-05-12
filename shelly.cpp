@@ -228,7 +228,7 @@ string applyPlaceholders(const string &value)
     pos = 0;
     while ((pos = newValue.find("\\033", pos)) != string::npos)
     {
-        newValue.replace(pos, 4, "\033[");
+        newValue.replace(pos, 4, "\033");
         pos += 2;
     }
 
