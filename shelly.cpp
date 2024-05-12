@@ -17,7 +17,7 @@ string input;
 
 // Defining methods
 string getHomeDirectory();
-string applyPlaceholders(const string &value);
+string formatText(const string &value);
 int shell();
 int executeCommand(string command);
 int executeCommandFromFile(string file);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     getWelcome();
     if (welcome != "")
     {
-        cout << applyPlaceholders(welcome) << endl;
+        cout << formatText(welcome) << endl;
     }
 
     while (true)
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 // Prompt and input handler
 int shell()
 {
-    cout << applyPlaceholders(prompt) + "\033[0m";
+    cout << formatText(prompt) + "\033[0m";
     getline(cin, input);
     executeCommand(input);
     return 0;
@@ -171,7 +171,7 @@ string getHomeDirectory()
 }
 
 // Aplies placeholders and colors
-string applyPlaceholders(const string &value)
+string formatText(const string &value)
 {
     string newValue = value;
     size_t pos = 0;
