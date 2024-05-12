@@ -21,6 +21,7 @@ string formatText(const string &value);
 int shell();
 int executeCommand(string command);
 int executeCommandFromFile(string file);
+int help(string parameters);
 int echo(string text);
 int set(string parameters);
 int writeWelcome();
@@ -31,10 +32,10 @@ int createConfigDir();
 
 int main(int argc, char *argv[])
 {
-    if(argc >= 3 && strcmp(argv[1], "-c") == 0)
+    if (argc >= 3 && strcmp(argv[1], "-c") == 0)
     {
         string command;
-        for(int args = 2; args < argc; args++)
+        for (int args = 2; args < argc; args++)
         {
             cout << args;
             command.append(argv[args]);
@@ -104,7 +105,21 @@ int executeCommand(string command)
     }
     else if (command.find("echo") == 0)
     {
-        echo(command.substr(5).data());
+        if (command.size() > 5)
+        {
+            echo(command.substr(5).data());
+        }
+    }
+    else if (command.find("help") == 0)
+    {
+        if (command.size() > 5)
+        {
+            help(command.substr(5).data());
+        }
+        else
+        {
+            help("");
+        }
     }
     else if (command != "")
     {
@@ -148,6 +163,49 @@ int executeCommandFromFile(string file)
     for (auto &arg : args)
     {
         free(arg);
+    }
+    return 0;
+}
+
+// Shows the help message
+int help(string parameters)
+{
+    if (parameters == "commands")
+    {
+        cout << "Shelly provides the following built-in commands:\n\n"
+                     "- set <prompt/placeholder> <value>: Allows changing the prompt or placeholder.\n"
+                     "- cd <directory>: Changes the current directory.\n"
+                     "- echo [text]: Writes text to the console.\n"
+                     "- exit [exit code]: Exits the shell.\n";
+    }
+    else if (parameters == "placeholders")
+    {
+        cout << "Placeholders are a symbolic representation of something that will later be replaced with it's actual value later by the shell. This can be used in your prompt or welcome message.\n\n"
+                     "- {cwd}: Current working directory.\n"
+                     "- {username}: Username of the current user.\n"
+                     "- {hostname}: Hostname (PC name).\n";
+    }
+    else if (parameters == "colors")
+    {
+        cout << "You can use the \\033[Xm sequence to adjust the foreground and background colors of your prompt or welcome message text. Simply substitute 'X' with the appropriate color code from the provided table:\n\n"
+                     "Color Name  | Foreground Color Code  | Background Color Code\n"
+                     "Black       | 30                     | 40\n"
+                     "Red         | 31                     | 41\n"
+                     "Green       | 32                     | 42\n"
+                     "Yellow      | 33                     | 43\n"
+                     "Blue        | 34                     | 44\n"
+                     "Magenta     | 35                     | 45\n"
+                     "Cyan        | 36                     | 46\n"
+                     "White       | 37                     | 47\n"
+                     "Default     | 39                     | 49\n"
+                     "Reset       | 0                      | 0\n";
+    }
+    else
+    {
+        cout << "Available help parameters:\n"
+                     "commands: Provides information about built-in commands.\n"
+                     "placeholders: Explains the usage of placeholders in prompts or welcome messages.\n"
+                     "colors: Describes how to use color codes in prompts or welcome messages.\n";
     }
     return 0;
 }
@@ -201,7 +259,8 @@ string formatText(const string &value)
         if (newValue[pos] == '{')
         {
             size_t endPos = newValue.find('}', pos + 1);
-            if (pos > 0 && newValue[pos - 1] == '\\') {
+            if (pos > 0 && newValue[pos - 1] == '\\')
+            {
                 ++pos;
                 continue;
             }
@@ -232,7 +291,8 @@ string formatText(const string &value)
     pos = 0;
     while ((pos = newValue.find("\\n", pos)) != string::npos)
     {
-        if (pos == 0 || (pos > 0 && newValue[pos - 1] != '\\')) {
+        if (pos == 0 || (pos > 0 && newValue[pos - 1] != '\\'))
+        {
             newValue.replace(pos, 2, "\n");
         }
         ++pos;
@@ -267,7 +327,7 @@ int writeWelcome()
 {
     string configDir = getHomeDirectory() + "/.config/shelly/";
     string configFile = configDir + "welcome";
-    
+
     ofstream ofs(configFile);
     if (!ofs.is_open())
     {
@@ -366,6 +426,6 @@ int createConfigDir()
             return 1;
         }
     }
-    
+
     return 0;
 }
