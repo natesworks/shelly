@@ -188,17 +188,17 @@ int help(string parameters)
     else if (parameters == "colors")
     {
         cout << "You can use the \\033[Xm sequence to adjust the foreground and background colors of your prompt or welcome message text. Simply substitute 'X' with the appropriate color code from the provided table:\n\n"
-                     "Color Name  | Foreground Color Code  | Background Color Code\n"
-                     "Black       | 30                     | 40\n"
-                     "Red         | 31                     | 41\n"
-                     "Green       | 32                     | 42\n"
-                     "Yellow      | 33                     | 43\n"
-                     "Blue        | 34                     | 44\n"
-                     "Magenta     | 35                     | 45\n"
-                     "Cyan        | 36                     | 46\n"
-                     "White       | 37                     | 47\n"
-                     "Default     | 39                     | 49\n"
-                     "Reset       | 0                      | 0\n";
+                     "| Color Name  | Foreground Color Code  | Background Color Code |\n"
+                     "| Black       | 30                     | 40                    |\n"
+                     "| Red         | 31                     | 41                    |\n"
+                     "| Green       | 32                     | 42                    |\n"
+                     "| Yellow      | 33                     | 43                    |\n"
+                     "| Blue        | 34                     | 44                    |\n"
+                     "| Magenta     | 35                     | 45                    |\n"
+                     "| Cyan        | 36                     | 46                    |\n"
+                     "| White       | 37                     | 47                    |\n"
+                     "| Default     | 39                     | 49                    |\n"
+                     "| Reset       | 0                      | 0                     |\n";
     }
     else
     {
