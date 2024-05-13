@@ -1,3 +1,7 @@
+## Yet another canceled project
+
+While the intention behind Shelly was to enhance the terminal experience, it became apparent that Bash already offered many of the features we had planned to implement. As a result, the project is unmaintained. Feel free to fork this project and do whatever you want with it.
+
 # Shelly
 
 Shelly is a simple shell implemented in C++. It provides basic functionality for command-line interaction.
